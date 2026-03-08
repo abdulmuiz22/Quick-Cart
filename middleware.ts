@@ -1,24 +1,27 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-// 1. Mark the Inngest API route as public
+// 1. Define the Inngest route as public
 const isPublicRoute = createRouteMatcher([
-  '/api/inngest(.*)', 
-  '/', 
-  '/sign-in(.*)', 
+  '/api/inngest(.*)', // The (.*) is crucial to match all Inngest sub-paths
+  '/',
+  '/sign-in(.*)',
   '/sign-up(.*)'
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
-  // 2. Protect everything EXCEPT the public routes
+  // 2. ONLY protect if it's NOT a public route
   if (!isPublicRoute(request)) {
-    await auth.protect();
+    await auth.protect(); 
   }
+  // If it IS a public route, Clerk does nothing and the request 
+  // continues to your API handler.
 });
 
 export const config = {
-  // 3. Ensure the matcher includes your API routes
   matcher: [
+    // Skip Next.js internals and all static files
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
     '/(api|trpc)(.*)',
   ],
 };
