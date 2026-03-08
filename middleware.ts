@@ -1,4 +1,4 @@
-import { clerkMiddleware } from '@clerk/nextjs/server';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
 export default clerkMiddleware();
 
@@ -10,3 +10,11 @@ export const config = {
     '/(api|trpc)(.*)',
   ],
 };
+const isPublicRoute = createRouteMatcher([
+  '/api/inngest(.*)', // This allows Inngest to bypass Clerk
+  '/sign-in(.*)',
+  '/sign-up(.*)',
+  '/'
+]);;
+
+export { isPublicRoute };
